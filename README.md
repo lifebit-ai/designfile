@@ -1,5 +1,4 @@
-# lifebit-ai/designfile
-
+#  `lifebit-ai/designfile`  <img src="https://avatars0.githubusercontent.com/u/30871219?s=200&v=4" width="30"/> 
 Minimal Nextflow workflow that collects the paths from an S3 location (bucket, folder of bucket) into a design file to be used for subsequent workflows
 
 
