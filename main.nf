@@ -42,7 +42,7 @@ Channel.fromPath("${params.s3_location}/**/*.{${params.file_suffix},${params.ind
     echo true
 
     output:  
-    file("${params.output_file}")
+    file("${params.output_file}") into ch_design_file
 
     """
     echo "name,file,index" > header.csv
@@ -50,3 +50,30 @@ Channel.fromPath("${params.s3_location}/**/*.{${params.file_suffix},${params.ind
     cat header.csv body.csv > ${params.output_file}
     """
     }
+
+if (params.stage_files) {
+
+    // Re-usable component to create a channel with the links of the files by reading the design file that has a header (skip:1 ommits this 1st row)
+    ch_design_file
+        .splitCsv(sep: ',', skip: 1)
+        .map { name, file_path, index_path -> [ name, file(file_path), file(index_path) ] }
+        .set { ch_files_sets }
+
+    // Re-usable process skeleton that performs a simple operation, listing files
+    process view_file_sets {
+    tag "id:${name}-file:${file_path}-index:${index_path}"
+    echo true
+    publishDir "results/${name}/"
+
+    input:
+    set val(name), file(file_path), file(index_path) from ch_files_sets
+
+    output:
+    file("${name}.txt")
+
+    script:
+    """
+    ls -lL > ${name}.txt
+    """
+    }
+}
