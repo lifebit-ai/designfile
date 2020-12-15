@@ -32,15 +32,15 @@ The name of the output file to write the design file with the columns:
 - file
 - index
 
-For example `design.csv`. It must have a ".csv" suffix, or else the pipeline will stop with an error similar to the following:
+Default: `design.csv`. It must have a ".csv" suffix, or else the pipeline will stop with an error similar to the following:
 
 ```console
 You have specified the --output_file to be 'this.txt', which does not indicate a comma sepearated file.
 Please specify an output file name with --output_file that ends with .csv
 ```
-#### `--stage_data`
+#### `--stage_files`
 
-_Optional_
+_Optional_ (Default: `false`)
 
 This flag can be used to test the staging of the data, not recommended if the outcome is only to retrieve the design files that points to the locations.
 However, the process can be used as an example of how would the file be read into a channel for use in the subsequent workflow that ustilises the data described in the design file.
