@@ -19,18 +19,18 @@ The S3 location of the bucket or a folder of the bucket. For example `'s3://life
 
 #### `--file_suffix`
 
-The file suffix `'cram'`
+The file suffix, for example`'cram'`.
 
 #### `--index_suffix`
 
-The file index suffix `'crai'`
+The file index suffix, for example `'crai'`.
 
 
 ## Output
 
 The output file is expected to look like this:
 
-```
+```csv
 # contents of design.csv file
 
 name,file,index
