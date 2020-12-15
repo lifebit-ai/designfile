@@ -15,16 +15,13 @@ if (!params.output_file.endsWith('csv')) exit 1, "You have specified the --outpu
 Channel.fromPath("${params.s3_location}/**/*.{${params.file_suffix},${params.index_suffix}}")
        .map { it -> [ file(it).simpleName, "s3:/"+it] }
        .groupTuple(by:0)
-    //    .view()
        .set { ch_files }
 
     process create_design_row {
-    tag "${name}"
-    echo true
+    tag "id:${name},files:${s3_file.collect {"$it"}.join(',')}"
 
     input:
     set val(name), val(s3_file) from ch_files
-    echo true
 
     output:
     file "${name}.csv" into ch_rows
@@ -39,7 +36,6 @@ Channel.fromPath("${params.s3_location}/**/*.{${params.file_suffix},${params.ind
 
     input:
     file(design_rows) from ch_rows.collect()
-    echo true
 
     output:  
     file("${params.output_file}") into ch_design_file
