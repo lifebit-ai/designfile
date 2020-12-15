@@ -19,11 +19,11 @@ The S3 location of the bucket or a folder of the bucket. For example `'s3://life
 
 #### `--file_suffix`
 
-The file suffix, for example`'cram'`.
+The file suffix, default: `'cram'`.
 
 #### `--index_suffix`
 
-The file index suffix, for example `'crai'`.
+The file index suffix, default: `'crai'`.
 
 #### `--output_file`
 
@@ -32,7 +32,7 @@ The name of the output file to write the design file with the columns:
 - file
 - index
 
-For example `design.csv`. It must have a ".csv" siffix, or else the pipeline will stop with an error similar to the following:
+For example `design.csv`. It must have a ".csv" suffix, or else the pipeline will stop with an error similar to the following:
 
 ```console
 You have specified the --output_file to be 'this.txt', which does not indicate a comma sepearated file.
