@@ -25,7 +25,19 @@ The file suffix, for example`'cram'`.
 
 The file index suffix, for example `'crai'`.
 
+#### `--output_file`
 
+The name of the output file to write the design file with the columns:
+- name
+- file
+- index
+
+For example `design.csv`. It must have a ".csv" siffix, or else the pipeline will stop with an error similar to the following:
+
+```console
+You have specified the --output_file to be 'this.txt', which does not indicate a comma sepearated file.
+Please specify an output file name with --output_file that ends with .csv
+```
 ## Output
 
 The output file is expected to look like this:
