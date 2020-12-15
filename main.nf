@@ -18,7 +18,7 @@ Channel.fromPath("${params.s3_location}/**/*.{${params.file_suffix},${params.ind
        .set { ch_files }
 
     process create_design_row {
-    tag "id:${name},files:${s3_file.collect {"$it"}.join(',')}"
+    tag "file:${name}"
 
     input:
     set val(name), val(s3_file) from ch_files
