@@ -75,11 +75,11 @@ if (params.stage_files) {
     set val(name), file(file_path) from ch_main_files
 
     output:
-    file("${name}.txt")
+    file("${name}_main_files_only.txt") ch_main_files_lists
 
     script:
     """
-    ls -l > ${name}.txt
+    ls -l > ${name}_main_files_only.txt
     ls -l
     """
     }
@@ -99,11 +99,11 @@ if (params.stage_files) {
     set val(name), file(file_path) from ch_indices
 
     output:
-    file("${name}.txt")
+    file("${name}_indices_only.txt") into ch_indices_only_lists
 
     script:
     """
-    ls -l > ${name}.txt
+    ls -l > ${name}_indices_only.txt
     ls -l
     """
     }
@@ -123,11 +123,11 @@ if (params.stage_files) {
     set val(name), file(file_path), file(file_index) from ch_complete_sets
 
     output:
-    file("${name}.txt")
+    file("${name}_completed_file_sets.txt") into ch_completed_file_sets_list
 
     script:
     """
-    ls -l > ${name}.txt
+    ls -l > ${name}_completed_file_sets.txt
     ls -l
     """
     }
