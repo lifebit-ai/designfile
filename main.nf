@@ -32,7 +32,7 @@ Channel.fromPath("${params.s3_location}/**/*.{${params.file_suffix},${params.ind
     }
 
     process bind_design_rows {
-    publishDir 'results/', mode: 'copy'
+    publishDir 'results/s3_locations/', mode: 'copy'
 
     input:
     file(design_rows) from ch_rows.collect()
@@ -52,9 +52,9 @@ Channel.fromPath("${params.s3_location}/**/*.{${params.file_suffix},${params.ind
     echo "name,file"       > only_main_files_${params.output_file} 
     echo "name,file,index" > complete_file_sets_${params.output_file}
 
-    grep -v '.${params.file_suffix},' body.csv | grep -v '.${params.file_suffix}\$'  >> only_indices_${params.output_file}
-    grep '.${params.file_suffix}\$'   body.csv >> only_main_files_${params.output_file}
-    grep    '.${params.file_suffix},' body.csv >> complete_file_sets_${params.output_file}
+    cat body.csv | { grep -v '.${params.file_suffix},' || true; } | { grep -v '.${params.file_suffix}\$' || true; } >> only_indices_${params.output_file}
+    cat body.csv | { grep '.${params.file_suffix}\$'   || true; } >> only_main_files_${params.output_file}
+    cat body.csv | { grep '.${params.file_suffix},'    || true; } >> complete_file_sets_${params.output_file}
     """
     }
 
@@ -69,7 +69,7 @@ if (params.stage_files) {
     // Re-usable process skeleton that performs a simple operation, listing files
     process stage_main_files {
     tag "id:${name}"
-    publishDir "results/main_files_only/"
+    publishDir "results/staged_files/main_files_only/"
 
     input:
     set val(name), file(file_path) from ch_main_files
@@ -93,7 +93,7 @@ if (params.stage_files) {
     // Re-usable process skeleton that performs a simple operation, listing files
     process stage_index_files {
     tag "id:${name}"
-    publishDir "results/indices_only/"
+    publishDir "results/staged_files/indices_only/"
 
     input:
     set val(name), file(file_path) from ch_indices
@@ -117,7 +117,7 @@ if (params.stage_files) {
     // Re-usable process skeleton that performs a simple operation, listing files
     process stage_file_sets {
     tag "id:${name}"
-    publishDir "results/${name}/"
+    publishDir "results/staged_files/completed_file_sets/"
 
     input:
     set val(name), file(file_path), file(file_index) from ch_complete_sets
