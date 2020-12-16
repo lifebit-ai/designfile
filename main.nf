@@ -39,7 +39,7 @@ Channel.fromPath("${params.s3_location}/**/*.{${params.file_suffix},${params.ind
 
     output:  
     file("${params.output_file}") into ch_design_file
-    set file("only_indices_missing_main_file.csv"), file("files_with_missing_indices.csv"), 
+    set file("only_indices_missing_main_file.csv"), file("files_with_missing_indices.csv")
     
     """
     echo "name,file,index" > header.csv
