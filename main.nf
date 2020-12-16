@@ -79,8 +79,8 @@ if (params.stage_files) {
 
     script:
     """
-    ls -lL > ${name}.txt
-    ls -lL
+    ls -l > ${name}.txt
+    ls -l
     """
     }
 
@@ -103,8 +103,8 @@ if (params.stage_files) {
 
     script:
     """
-    ls -lL > ${name}.txt
-    ls -lL
+    ls -l > ${name}.txt
+    ls -l
     """
     }
 
@@ -127,8 +127,8 @@ if (params.stage_files) {
 
     script:
     """
-    ls -lL > ${name}.txt
-    ls -lL
+    ls -l > ${name}.txt
+    ls -l
     """
     }
 }
