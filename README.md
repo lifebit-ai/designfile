@@ -41,6 +41,35 @@ Default: `design.csv`. It must have a ".csv" suffix, or else the pipeline will s
 You have specified the --output_file to be 'this.txt', which does not indicate a comma sepearated file.
 Please specify an output file name with --output_file that ends with .csv
 ```
+
+Four output files will be generated.
+
+Given the `--output_file` is **`design.csv`** the expected file names are:
+
+#####  1. **`design.csv`:**
+
+Comma seperated file with 3 columns, `name, file, index`.
+Contains as many rows as unique names of files matching the `--file_suffix`, `--index_suffix` regex in the defined `--s3_location`.
+In the case that the set of files (main, index) is missing either the main file (eg. `cram`) or the index file (eg. `crai`), some rows will have less than 3 entries.
+
+#####  2. `only_indices_`**`design.csv`:**
+
+Comma seperated file with 2 columns, `name, index`.
+Contains as many rows as the numder of file sets that are missing the main file and only have the index file.
+All rows are expected to have 2 columns.
+
+#####  3. `only_main_files_`**`design.csv`:**
+
+Comma seperated file with 2 columns, `name, index`.
+Contains as many rows as the numder of file sets that are missing the index in file and only have the index file.
+All rows are expected to have 2 columns.
+
+##### 4. `complete_file_sets_`**`design.csv`:**
+
+Comma seperated file with 3 columns, `name, file, index`.
+Contains as many rows as the numder of file sets that are missing the main file and only have the index file.
+All rows are expected to have 3 columns.
+
 #### `--stage_files`
 
 _Optional_ (Default: `false`)
@@ -58,32 +87,32 @@ If you are starting in a new Nextflow pipeline using the output file from [`life
 // contents of main.nf
 
 // Define ideally in nextflow.config instead of main.nf and initialise to false
-params.design_file = "results/design.csv"
+params.design_file = "results/complete_file_sets_design.csv"
 
 // Re-usable component to create a channel with the links of the files by reading the design file that has a header (skip:1 ommits this 1st row)
-Channel.fromPath(params.design_file)
-    .splitCsv(sep: ',', skip: 1)
-    .map { name, file_path, index_path -> [ name, file(file_path), file(index_path) ] }
-    .set { ch_files_sets }
+Channel.fromPath(params.design_file_complete_sets)
+      .splitCsv(sep: ',', skip: 1)
+      .map { name, main_file, index_file -> [name, file(main_file), file(index_file) ] }
+      .set { ch_complete_sets }
 
-// Re-usable process skeleton that performs a simple operation, listing files
-process view_file_sets {
-tag "id:${name}-file:${file_path}-index:${index_path}"
-echo true
-publishDir "results/${name}/", mode: "copy"
+  // Re-usable process skeleton that performs a simple operation, listing files
+  process stage_file_sets {
+  tag "id:${name}"
+  echo true
+  publishDir "results/${name}/"
 
-input:
-set val(name), file(file_path), file(index_path) from ch_files_sets
+  input:
+  set val(name), file(file_path), file(file_index) from ch_complete_sets
 
-output:
-file("${name}.txt")
+  output:
+  file("${name}.txt")
 
-script:
-"""
-ls -lL > ${name}.txt
-"""
-}
-
+  script:
+  """
+  ls -lL > ${name}.txt
+  ls -lL
+  """
+  }
 ```
 
 </details>
