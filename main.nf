@@ -6,6 +6,7 @@ def helpMessage() {
     nextflow run main.nf --s3_location  's3://lifebit-featured-datasets/IGV/' --file_suffix 'cram' --index_suffix 'crai' --output_file design_file.csv
     Mandatory arguments:
 
+
     """.stripIndent()
 }
 
@@ -68,7 +69,6 @@ if (params.stage_files) {
     // Re-usable process skeleton that performs a simple operation, listing files
     process stage_main_files {
     tag "id:${name}"
-    echo true
     publishDir "results/main_files_only/"
 
     input:
@@ -93,7 +93,6 @@ if (params.stage_files) {
     // Re-usable process skeleton that performs a simple operation, listing files
     process stage_index_files {
     tag "id:${name}"
-    echo true
     publishDir "results/indices_only/"
 
     input:
@@ -118,7 +117,6 @@ if (params.stage_files) {
     // Re-usable process skeleton that performs a simple operation, listing files
     process stage_file_sets {
     tag "id:${name}"
-    echo true
     publishDir "results/${name}/"
 
     input:
