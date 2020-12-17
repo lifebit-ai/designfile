@@ -60,75 +60,87 @@ Channel.fromPath("${params.s3_location}/**/*.{${params.file_suffix},${params.ind
 
 if (params.stage_files) {
 
-    // Re-usable component to create a channel with the links of the files by reading the design file that has a header (skip:1 ommits this 1st row)
     ch_main_files_only
         .splitCsv(sep: ',', skip: 1)
-        .map { name, main_file -> [name, file(main_file) ] }
+        .map { name, main_file -> [ name, file(main_file) ] }
         .set { ch_main_files }
 
-    // Re-usable process skeleton that performs a simple operation, listing files
     process stage_main_files {
     tag "id:${name}"
-    publishDir "results/staged_files/main_files_only/"
+    publishDir "results/staged_files_checksums/main_files_only/"
 
     input:
     set val(name), file(file_path) from ch_main_files
 
     output:
-    file("${name}_main_files_only.txt") ch_main_files_lists
+    file("${name}_main_files_only_md5sum.txt") into ch_main_files_lists
 
     script:
     """
-    ls -l > ${name}_main_files_only.txt
-    ls -l
+    md5sum *${params.file_suffix} > "${name}"_main_files_only_md5sum.txt
     """
     }
 
-    // Re-usable component to create a channel with the links of the files by reading the design file that has a header (skip:1 ommits this 1st row)
     ch_indices_only
         .splitCsv(sep: ',', skip: 1)
         .map { name, main_file -> [name, file(main_file) ] }
         .set { ch_indices }
 
-    // Re-usable process skeleton that performs a simple operation, listing files
     process stage_index_files {
     tag "id:${name}"
-    publishDir "results/staged_files/indices_only/"
+    publishDir "results/staged_files_checksums/indices_only/"
 
     input:
     set val(name), file(file_path) from ch_indices
 
     output:
-    file("${name}_indices_only.txt") into ch_indices_only_lists
+    file("${name}_indices_only_md5sum.txt") into ch_indices_only_lists
 
     script:
     """
-    ls -l > ${name}_indices_only.txt
-    ls -l
+    md5sum *${params.index_suffix} > ${name}_indices_only_md5sum.txt
     """
     }
 
-    // Re-usable component to create a channel with the links of the files by reading the design file that has a header (skip:1 ommits this 1st row)
     ch_complete_file_sets
         .splitCsv(sep: ',', skip: 1)
-        .map { name, main_file, index_file -> [name, file(main_file), file(index_file) ] }
+        .map { name, main_file, index_file -> [ name, file(main_file), file(index_file) ] }
         .set { ch_complete_sets }
 
-    // Re-usable process skeleton that performs a simple operation, listing files
     process stage_file_sets {
     tag "id:${name}"
-    publishDir "results/staged_files/completed_file_sets/"
+    publishDir "results/staged_files_checksums/completed_file_sets/"
 
     input:
     set val(name), file(file_path), file(file_index) from ch_complete_sets
 
     output:
-    file("${name}_completed_file_sets.txt") into ch_completed_file_sets_list
+    file("${name}_completed_file_sets_md5sum.txt") into ch_completed_file_sets_list
 
     script:
     """
-    ls -l > ${name}_completed_file_sets.txt
-    ls -l
+    md5sum *${params.file_suffix}* > ${name}_completed_file_sets_md5sum.txt
+    """
+    }
+
+    ch_main_files_lists
+        .concat(ch_indices_only_lists)
+        .concat(ch_completed_file_sets_list)
+        .set { ch_checksums }
+
+    process collect_checksums {
+    tag "id:${name}"
+    publishDir "results/staged_files_checksums/"
+
+    input:
+    file(checksums) from ch_checksums.collect()
+
+    output:
+    file("all_checksums.txt")
+
+    script:
+    """
+    cat *txt > all_checksums.txt
     """
     }
 }

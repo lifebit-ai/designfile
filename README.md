@@ -75,7 +75,26 @@ All rows are expected to have 3 columns.
 _Optional_ (Default: `false`)
 
 This flag can be used to test the staging of the data, not recommended if the outcome is only to retrieve the design files that points to the locations.
-However, the process can be used as an example of how would the file be read into a channel for use in the subsequent workflow that ustilises the data described in the design file.
+However, the process can be used 1) to retrieve the md5sums of the files 2) serve as an Nextflow snippet example of how would the design.csv file can be read into a channel for use in the subsequent workflow.
+
+If `--stage_files` is set to `true`, files with the md5sum will be generated per process for each file set or single main/index files and a collective one that summarises all the files found in the `--s3_location`.
+
+A typical results folder structure will be the following:
+
+```console
+results
+└── s3_locations/
+    ├── complete_file_sets_design.csv
+    ├── design.csv
+    ├── only_indices_design.csv
+    └── only_main_files_design.csv
+└── staged_files_checksums/
+    └── main_files_only/..
+    └── indices_only/..
+    └── completed_file_sets/..
+    └── all_checksums.txt
+```
+
 
 The process can be used as a template for the first process that needs to access the data listed in `design.csv`.
 If you are starting in a new Nextflow pipeline using the output file from [`lifebit-ai/designfile`](https://github.com/lifebit-ai/designfile), you can make use of 
@@ -109,8 +128,8 @@ Channel.fromPath(params.design_file_complete_sets)
 
   script:
   """
-  ls -lL > ${name}.txt
-  ls -lL
+  ls -l > ${name}.txt
+  ls -l
   """
   }
 ```
@@ -122,10 +141,24 @@ Channel.fromPath(params.design_file_complete_sets)
 
 The output file is expected to look like this:
 
+### `design.csv`
+
 ```csv
 # contents of design.csv file
 
 name,file,index
 SARS-COV2_pass,s3://lifebit-featured-datasets/IGV/cram/SARS-COV2_pass.minimap2.sorted.cram,s3://lifebit-featured-datasets/IGV/cram/SARS-COV2_pass.minimap2.sorted.cram.crai
 HG002_ONT,s3://lifebit-featured-datasets/IGV/samplot/HG002_ONT.cram,s3://lifebit-featured-datasets/IGV/samplot/HG002_ONT.cram.crai
+```
+
+### `all_checksums.txt`
+
+_(generated only when `--stage_files = true` only_)
+
+```console
+➜ cat results/staged_files_checksums/all_checksums.txt
+0850d3291bbdd5e5d90cbd9c5a3c62c0  HG002_ONT.cram
+3ac542da496c30958b6bce343733f743  HG002_ONT.cram.crai
+29c8c0566961706964b7342168f7ca7d  SARS-COV2_pass.minimap2.sorted.cram
+6392bc8e30400d1a018cb47b59790078  SARS-COV2_pass.minimap2.sorted.cram.crai
 ```
