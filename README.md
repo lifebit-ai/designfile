@@ -22,11 +22,11 @@ The S3 location of the bucket or a folder of the bucket. For example `'s3://life
 
 #### `--file_suffix`
 
-The file suffix, default: `'cram'`.
+The file suffix, default: `'cram'` (:warning: note: without the leading dot '.')
 
 #### `--index_suffix`
 
-The file index suffix, default: `'crai'`.
+The file index suffix, default: `'crai'` (:warning: note: without the leading dot '.')
 
 #### `--output_file`
 
