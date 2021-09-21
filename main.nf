@@ -12,8 +12,8 @@ def helpMessage() {
 
 if (!params.output_file.endsWith('csv')) exit 1, "You have specified the --output_file to be '${params.output_file}', which does not indicate a comma sepearated file.\nPlease specify an output file name with --output_file that ends with .csv"
 
-Channel.fromPath("${params.s3_location}/**/*.{${params.file_suffix},${params.index_suffix}}")
-       .map { it -> [ file(it).baseName.minus(".${params.file_suffix}").minus(".${params.index_suffix}"), "s3:/"+it] }
+Channel.fromPath("${params.s3_location}/**.{${params.file_suffix},${params.index_suffix}}")
+       .map { it -> [ file(it).name.minus(".${params.index_suffix}").minus(".${params.file_suffix}"), "s3:/"+it] }
        .groupTuple(by:0)
        .set { ch_files }
 
