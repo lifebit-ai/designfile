@@ -12,16 +12,23 @@ def helpMessage() {
 
 if (!params.output_file.endsWith('csv')) exit 1, "You have specified the --output_file to be '${params.output_file}', which does not indicate a comma sepearated file.\nPlease specify an output file name with --output_file that ends with .csv"
 
-Channel.fromPath("${params.s3_location}/**.{${params.file_suffix},${params.index_suffix}}")
-       .map { it -> [ file(it).name.minus(".${params.index_suffix}").minus(".${params.file_suffix}"), "s3:/"+it] }
-       .groupTuple(by:0)
+Channel.fromPath("${params.s3_location}/**.${params.file_suffix}")
+       .map { it -> [ file(it).name.minus(".${params.file_suffix}"), "s3:/"+it] }
        .set { ch_files }
+
+Channel.fromPath("${params.s3_location}/**.${params.index_suffix}")
+       .map { it -> [ file(it).name.minus(".${params.index_suffix}").minus(".${params.file_suffix}"), "s3:/"+it] }
+       .set { ch_indexes }
+
+ch_files_indexes = ch_files.join(ch_indexes, by:0, remainder:true)
+                    .map {it -> [it[0], it - it[0]] }   // it - it[0] returns array without first element
+
 
     process create_design_row {
     tag "file:${name}"
 
     input:
-    set val(name), val(s3_file) from ch_files
+    set val(name), val(s3_file) from ch_files_indexes
 
     output:
     file "${name}.csv" into ch_rows
