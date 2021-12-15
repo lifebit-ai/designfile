@@ -44,7 +44,7 @@ ch_files_indexes = ch_files.join(ch_indexes, by:0, remainder:params.keep_missing
     input:
     file(design_rows) from ch_rows.collect()
 
-    output:  
+    output:
     file("${params.output_file}") into ch_design_file
     file("only_indices_${params.output_file}") into ch_indices_only
     file("only_main_files_${params.output_file}") into ch_main_files_only
@@ -56,12 +56,12 @@ ch_files_indexes = ch_files.join(ch_indexes, by:0, remainder:params.keep_missing
     cat header.csv body.csv > ${params.output_file}
 
     echo "name,index"      > only_indices_${params.output_file}
-    echo "name,file"       > only_main_files_${params.output_file} 
+    echo "name,file"       > only_main_files_${params.output_file}
     echo "name,file,index" > complete_file_sets_${params.output_file}
 
-    cat body.csv | { grep -v '.${params.file_suffix},' || true; } | { grep -v '.${params.file_suffix}\$' || true; } >> only_indices_${params.output_file}
-    cat body.csv | { grep '.${params.file_suffix}\$'   || true; } >> only_main_files_${params.output_file}
-    cat body.csv | { grep '.${params.file_suffix},'    || true; } >> complete_file_sets_${params.output_file}
+    cat body.csv | { grep -v '\\.${params.file_suffix},' || true; } | cut -f1,3 -d"," >> only_indices_${params.output_file}
+    cat body.csv | { grep -v '\\.${params.index_suffix}' || true; } | cut -f1,2 -d"," >> only_main_files_${params.output_file}
+    cat body.csv | { grep '\\.${params.file_suffix},' || true; } | { grep '\\.${params.index_suffix}' || true; } >> complete_file_sets_${params.output_file}
     """
     }
 
