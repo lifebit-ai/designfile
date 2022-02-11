@@ -20,7 +20,7 @@ Channel.fromPath("${params.s3_location}/**.${params.index_suffix}")
        .map { it -> [ file(it).name.minus(".${params.index_suffix}").minus(".${params.file_suffix}"), "s3:/"+it] }
        .set { ch_indexes }
 
-ch_files_indexes = ch_files.join(ch_indexes, by:0, remainder:params.keep_missing)
+ch_files_and_indexes = ch_files.join(ch_indexes, by:0, remainder:params.keep_missing)
                     .map {it -> [it[0], it - it[0]] }   // it - it[0] returns array without first element
 
 
@@ -28,7 +28,7 @@ ch_files_indexes = ch_files.join(ch_indexes, by:0, remainder:params.keep_missing
     tag "file:${name}"
 
     input:
-    set val(name), val(s3_file) from ch_files_indexes
+    set val(name), val(s3_file) from ch_files_and_indexes
 
     output:
     file "${name}.csv" into ch_rows
