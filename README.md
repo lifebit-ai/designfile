@@ -70,6 +70,29 @@ Comma seperated file with 3 columns, `name, file, index`.
 Contains as many rows as the numder of file sets that are missing the main file and only have the index file.
 All rows are expected to have 3 columns.
 
+
+#### `--keep_missing`
+
+_Optional_ (Default: `true`)
+If some files will not have corresponding indexes or if some indexes will not have corresponding files, they will still be printed out by default with missing files defined as `null`:
+```
+nextflow run . --s3_location s3://lifebit-featured-datasets/tests/vlad/bams_indexes \
+               --file_suffix bam \
+               --index_suffix bai \
+               --output_file design.csv \
+               --executor local \
+               --keep_missing true
+```
+`design.csv`:
+```
+name,file,index
+rna3,s3://lifebit-featured-datasets/tests/vlad/bams_indexes/rna3.bam,s3://lifebit-featured-datasets/tests/vlad/bams_indexes/rna3.bai
+wgs1,s3://lifebit-featured-datasets/tests/vlad/bams_indexes/wgs1.bam,s3://lifebit-featured-datasets/tests/vlad/bams_indexes/wgs1.bai
+wgs2_nofile,null,s3://lifebit-featured-datasets/tests/vlad/bams_indexes/wgs2_nofile.bai
+rna4_noindex,s3://lifebit-featured-datasets/tests/vlad/bams_indexes/rna4_noindex.bam,null
+```
+To avoid printing files with missing counterpatrs at all use `--keep_missing false`.
+
 #### `--stage_files`
 
 _Optional_ (Default: `false`)
