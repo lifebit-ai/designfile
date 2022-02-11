@@ -55,9 +55,20 @@ ch_files_indexes = ch_files.join(ch_indexes, by:0, remainder:params.keep_missing
     for row in $design_rows; do cat \$row >> body.csv; done
     cat header.csv body.csv > ${params.output_file}
 
+    # Creating the lists of files that contain only files without indices, only indices, and only complete sets.
+
     echo "name,index"      > only_indices_${params.output_file}
     echo "name,file"       > only_main_files_${params.output_file}
     echo "name,file,index" > complete_file_sets_${params.output_file}
+
+    # Mathcing the pattern. Logic:
+    # 1. In order to match extesion, we need to escape the dot with \. in grep. In order to get \ to grep from nextflow, we need to escape it again in nextflow, which leads to \\.
+    # 2. -v argument for grep allows inverted match, to find all lines that DON'T have eg the index to report as all files without indexes, and vice versa.
+    # 3. The comma ',' after search param in first and third line is important. Since often index files contain both file and index sufixes (like .bam.bai) inverted matching for
+    # just file suffix would still match cases .bam.bai for '.bam' even if only index is present and fail to report this one as index-ony.
+    # Comma after the file suffix allows to only look for files, because in the body.csv filenames are second column which are always followed by index column even if its empty.
+    # And since columns in csv are always separated by comma, looking for '.bam,' instead of '.bam' will never match index '.bam.bai'.
+    # 4. The '|| true' part is needed to avoid exit code 1 which grep gives if there are no matches. Without '|| true' nextflow porcess would immediately fail in case if all files have all indices.
 
     cat body.csv | { grep -v '\\.${params.file_suffix},' || true; } | cut -f1,3 -d"," >> only_indices_${params.output_file}
     cat body.csv | { grep -v '\\.${params.index_suffix}' || true; } | cut -f1,2 -d"," >> only_main_files_${params.output_file}
