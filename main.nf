@@ -62,7 +62,7 @@ ch_files_and_indexes = ch_files.join(ch_indexes, by:0, remainder:params.keep_mis
     echo "name,file,index" > complete_file_sets_${params.output_file}
 
     # Mathcing the pattern. Logic:
-    # 1. In order to match extesion, we need to escape the dot with \. in grep. In order to get \ to grep from nextflow, we need to escape it again in nextflow, which leads to \\.
+    # 1. In order to match extesion, we need to escape the dot with backsalsh in grep. In order to get backsalsh to grep from nextflow, we need to escape it again in nextflow, which leads to two backsalshes.
     # 2. -v argument for grep allows inverted match, to find all lines that DON'T have eg the index to report as all files without indexes, and vice versa.
     # 3. The comma ',' after search param in first and third line is important. Since often index files contain both file and index sufixes (like .bam.bai) inverted matching for
     # just file suffix would still match cases .bam.bai for '.bam' even if only index is present and fail to report this one as index-ony.
